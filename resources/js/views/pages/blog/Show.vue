@@ -16,10 +16,12 @@
             <div class="card mb-3">
                 <img :src="blog.banner" class="card-img-top" :alt="blog.name">
                 <div class="card-body ckeditor-view p-0">
+                    <h3 class="card-title py-3 px-3 bg-light mb-0" :title="blog.slug">{{ blog.name }}</h3>
                     <div class="d-none">
-                        <h5 class="card-title">{{ blog.name }}</h5>
+                        <h5 class="card-title" :title="blog.slug">{{ blog.name }}</h5>
                         <p class="card-text" v-html="blog.body"></p>
-                        <p class="card-text"><small class="text-muted">Last updated {{ blog.updated_at_humans }}</small>
+                        <p class="card-text">
+                            <small class="text-muted">Last updated {{ blog.updated_at_humans }}</small>
                         </p>
                     </div>
                     <ckeditor
@@ -28,6 +30,10 @@
                         v-model="blog.body"
                         :config="editorConfig"
                     ></ckeditor>
+                    <div class="px-3 py-3 bg-light">
+                        <div><strong>Last updated:</strong> {{ blog.updated_at_humans }}</div>
+                        <div><strong>Tags:</strong> {{ blog.tag }}</div>
+                    </div>
                 </div>
             </div>
 
@@ -36,7 +42,9 @@
             <form @submit.prevent="sendComment($event)" class="mb-3">
                 <div class="mb-3">
                     <label class="form-label">Comment</label>
-                    <textarea data-comment="comment" v-model="aComment" rows="5" class="form-control"></textarea>
+                    <textarea data-comment="comment" v-model="aComment" rows="5"
+                              placeholder="Write a comment..."
+                              class="form-control"></textarea>
                 </div>
                 <button type="submit" class="btn btn-primary">Comment</button>
             </form>
@@ -90,7 +98,7 @@
                                 <strong>Write a reply</strong>
                             </label>
                             <div class="form-group d-flex">
-                                <input data-comment="comment" class="form-control me-2"/>
+                                <input placeholder="Reply" data-comment="comment" class="form-control me-2"/>
                                 <button type="submit" class="btn btn-primary">Reply</button>
                             </div>
                         </div>
