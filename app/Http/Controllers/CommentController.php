@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Comment;
+use App\Repositories\CommentRepository;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
@@ -37,9 +38,7 @@ class CommentController extends Controller
      */
     public function store(Request $request)
     {
-        $comment           = Comment::query()->create($request->all());
-        $comment->children = [];
-        return $comment;
+        return (new CommentRepository())->store($request);
     }
 
     /**

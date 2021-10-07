@@ -6,12 +6,38 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * @property mixed created_at
+ * @property mixed updated_at
+ * @property mixed banner
+ */
 class Blog extends Model
 {
-    use HasFactory, HasFactory;
+    use HasFactory, SoftDeletes;
 
-    protected $appends = ['created_at_humans', 'updated_at_humans'];
+    /**
+     * @var array
+     */
+    protected $guarded = [];
+
+    /**
+     * @var string[]
+     */
+    protected $appends = ['created_at_humans', 'updated_at_humans', 'old_banner'];
+
+    /*
+    |--------------------------------------------------------------------------
+    | FUNCTIONS
+    |--------------------------------------------------------------------------
+    */
+
+    /*
+    |--------------------------------------------------------------------------
+    | RELATIONS
+    |--------------------------------------------------------------------------
+    */
 
     /**
      * @return BelongsTo
@@ -29,6 +55,18 @@ class Blog extends Model
         return $this->hasMany(Comment::class);
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | SCOPES
+    |--------------------------------------------------------------------------
+    */
+
+    /*
+    |--------------------------------------------------------------------------
+    | ACCESSORS
+    |--------------------------------------------------------------------------
+    */
+
     /**
      * @return string
      */
@@ -44,4 +82,18 @@ class Blog extends Model
     {
         return $this->updated_at->diffForHumans();
     }
+
+    /**
+     * @return string
+     */
+    public function getOldBannerAttribute(): string
+    {
+        return $this->banner ?? '';
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | MUTATORS
+    |--------------------------------------------------------------------------
+    */
 }

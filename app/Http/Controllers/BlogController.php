@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\ImageHelper;
 use App\Models\Blog;
+use App\Repositories\BlogRepository;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class BlogController extends Controller
 {
@@ -18,9 +21,7 @@ class BlogController extends Controller
      */
     public function index(): JsonResponse
     {
-        $blogs = Blog::query()->with('category')->get();
-
-        return response()->json($blogs);
+        return (new BlogRepository)->list();
     }
 
     /**
@@ -36,29 +37,23 @@ class BlogController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @return JsonResponse
      */
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
-        //
+        return (new BlogRepository)->store($request);
     }
 
     /**
      * Display the specified resource.
      *
      * @param $id
-     * @return Builder|Model
+     * @return JsonResponse
      */
-    public function show($id)
+    public function show($id): JsonResponse
     {
-        return Blog::query()
-            ->where('id', $id)
-            ->with('category')
-            ->with('comments', function ($q) {
-                $q->whereNull('parent_id')->with('children');
-            })
-            ->firstOrFail();
+        return (new BlogRepository)->show($id);
     }
 
     /**
@@ -73,15 +68,15 @@ class BlogController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update the specified resozurce in storage.
      *
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Blog $blog
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @param Blog $blog
+     * @return JsonResponse
      */
-    public function update(Request $request, Blog $blog)
+    public function update(Request $request, Blog $blog): JsonResponse
     {
-        //
+        return (new BlogRepository)->update($request, $blog);
     }
 
     /**
@@ -90,8 +85,8 @@ class BlogController extends Controller
      * @param Blog $blog
      * @return bool|null
      */
-    public function destroy(Blog $blog)
+    public function destroy(Blog $blog): ?bool
     {
-        return $blog->delete();
+        return (new BlogRepository)->destroy($blog);
     }
 }

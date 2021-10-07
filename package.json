@@ -13,12 +13,23 @@
         "axios": "^0.21",
         "laravel-mix": "^6.0.6",
         "lodash": "^4.17.19",
+        "node-sass": "^6.0.1",
         "postcss": "^8.1.14",
+        "sass-loader": "^12.1.0",
         "vue-loader": "^16.8.1"
     },
     "dependencies": {
+        "@ckeditor/ckeditor5-build-classic": "^30.0.0",
+        "@ckeditor/ckeditor5-dev-utils": "^25.4.4",
+        "@ckeditor/ckeditor5-dev-webpack-plugin": "^25.4.4",
+        "@ckeditor/ckeditor5-source-editing": "^30.0.0",
+        "@ckeditor/ckeditor5-upload": "^30.0.0",
+        "@ckeditor/ckeditor5-vue": "^2.0.1",
         "@popperjs/core": "^2.10.2",
         "bootstrap": "^5.1.2",
+        "postcss-loader": "^3.0.0",
+        "raw-loader": "^0.5.1",
+        "toastr": "^2.1.4",
         "vue": "^3.2.19",
         "vue-router": "^4.0.11"
     }
