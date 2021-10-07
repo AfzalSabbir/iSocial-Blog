@@ -24,3 +24,4 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::apiResource('/blog', BlogController::class);
 Route::apiResource('/comment', CommentController::class);
 Route::apiResource('/category', CategoryController::class);
+Route::post('/image/store', [BlogController::class, 'imageStore']);

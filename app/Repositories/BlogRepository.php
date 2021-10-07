@@ -90,4 +90,16 @@ class BlogRepository implements BlogInterface
         (new ImageHelper)->deleteImage($blog->banner);
         return $blog->delete();
     }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function imageStore(Request $request): JsonResponse
+    {
+        $url = ImageHelper::uploadImage($request, false, 'upload');
+        return response()->json([
+            'url' => $url
+        ]);
+    }
 }

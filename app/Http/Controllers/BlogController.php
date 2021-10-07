@@ -99,4 +99,15 @@ class BlogController extends Controller
     {
         return $this->blogRepository->destroy($blog);
     }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function imageStore(Request $request): JsonResponse
+    {
+        return $this->blogRepository->imageStore($request);
+    }
 }

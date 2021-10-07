@@ -20,10 +20,12 @@ class ImageHelper
             (new ImageHelper)->deleteImage($request->old_banner);
         }
 
-        if ($request->banner) {
-            $extension = explode('/', mime_content_type($request->banner))[1];
+        if ($request->{$field}) {
+            $extension = $request->hasFile($field)
+                ? $request->{$field}->getClientOriginalExtension()
+                : explode('/', mime_content_type($request->{$field}))[1];
             $fullPath  = '/uploads/' . time() . '.' . $extension;
-            $image     = Image::make($request->banner);
+            $image     = Image::make($request->{$field});
             $image->save(public_path($fullPath));
         }
         return $fullPath;

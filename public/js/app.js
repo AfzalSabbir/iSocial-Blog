@@ -19529,6 +19529,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _ckeditor_ckeditor5_build_classic__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_ckeditor_ckeditor5_build_classic__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
 /* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _uploadAdapter__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../uploadAdapter */ "./resources/js/uploadAdapter.js");
+/* harmony import */ var _upload__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../../upload */ "./resources/js/upload.js");
+
+
 
 
 
@@ -19548,14 +19552,27 @@ __webpack_require__.r(__webpack_exports__);
         category_id: ''
       },
       maxSize: 1024 * 1024 * 2,
+
+      /*editor      : ClassicEditor,
+      editorConfig: {
+          toolbar    : [
+              'heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', '|', 'insertTable', '|',
+              'imageUpload', 'mediaEmbed', '|', 'undo', 'redo'
+          ],
+          table      : {
+              toolbar: ['tableColumn', 'tableRow', 'mergeTableCells']
+          },
+          extraPlugin: [this.uploader],
+          language   : 'en',
+      },*/
       editor: (_ckeditor_ckeditor5_build_classic__WEBPACK_IMPORTED_MODULE_1___default()),
       editorConfig: {
         toolbar: ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', '|', 'insertTable', '|', 'imageUpload', 'mediaEmbed', '|', 'undo', 'redo'],
         table: {
           toolbar: ['tableColumn', 'tableRow', 'mergeTableCells']
         },
-        extraPlugin: [],
-        language: 'en'
+        extraPlugins: [this.simpleUploadAdapterPlugin],
+        language: 'nl'
       }
     };
   },
@@ -19570,6 +19587,17 @@ __webpack_require__.r(__webpack_exports__);
     }
   },
   methods: {
+    uploader: function uploader(editor) {
+      editor.plugins.get('FileRepository').createUploadAdapter = function (loader) {
+        return new _upload__WEBPACK_IMPORTED_MODULE_4__["default"](loader);
+      };
+    },
+    simpleUploadAdapterPlugin: function simpleUploadAdapterPlugin(editor) {
+      editor.plugins.get('FileRepository').createUploadAdapter = function (loader) {
+        // Configure the URL to the upload script in your back-end here!
+        return new _uploadAdapter__WEBPACK_IMPORTED_MODULE_3__["default"](loader);
+      };
+    },
     getBlog: function getBlog() {
       var _this = this;
 
@@ -20681,6 +20709,253 @@ var router = (0,vue_router__WEBPACK_IMPORTED_MODULE_4__.createRouter)({
   routes: routes
 });
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (router);
+
+/***/ }),
+
+/***/ "./resources/js/upload.js":
+/*!********************************!*\
+  !*** ./resources/js/upload.js ***!
+  \********************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ UploadAdapter)
+/* harmony export */ });
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var UploadAdapter = /*#__PURE__*/function () {
+  function UploadAdapter(loader) {
+    _classCallCheck(this, UploadAdapter);
+
+    // The file loader instance to use during the upload.
+    this.loader = loader;
+  } // Starts the upload process.
+
+
+  _createClass(UploadAdapter, [{
+    key: "upload",
+    value: function upload() {
+      var _this = this;
+
+      return this.loader.file.then(function (file) {
+        return new Promise(function (resolve, reject) {
+          _this._initRequest();
+
+          _this._initListeners(resolve, reject, file);
+
+          _this._sendRequest(file);
+        });
+      });
+    } // Aborts the upload process.
+
+  }, {
+    key: "abort",
+    value: function abort() {
+      if (this.xhr) {
+        this.xhr.abort();
+      }
+    } // Initializes the XMLHttpRequest object using the URL passed to the constructor.
+
+  }, {
+    key: "_initRequest",
+    value: function _initRequest() {
+      var url = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '/api/image/store';
+      var token = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'token';
+      var xhr = this.xhr = new XMLHttpRequest();
+      xhr.open('POST', url, true);
+      xhr.responseType = 'json';
+    } // Initializes XMLHttpRequest listeners.
+
+  }, {
+    key: "_initListeners",
+    value: function _initListeners(resolve, reject, file) {
+      var xhr = this.xhr;
+      var loader = this.loader;
+      var genericErrorText = "Couldn't upload file: ".concat(file.name, ".");
+      xhr.addEventListener('error', function () {
+        return reject(genericErrorText);
+      });
+      xhr.addEventListener('abort', function () {
+        return reject();
+      });
+      xhr.addEventListener('load', function () {
+        var response = xhr.response;
+        console.log(xhr.response, 'xhr.response');
+
+        if (!response || response.error) {
+          return reject(response && response.error ? response.error.message : genericErrorText);
+        }
+
+        resolve({
+          "default": response.url
+        });
+      });
+
+      if (xhr.upload) {
+        xhr.upload.addEventListener('progress', function (evt) {
+          if (evt.lengthComputable) {
+            loader.uploadTotal = evt.total;
+            loader.uploaded = evt.loaded;
+          }
+        });
+      }
+    } // Prepares the data and sends the request.
+
+  }, {
+    key: "_sendRequest",
+    value: function _sendRequest(file) {
+      // Prepare the form data.
+      var data = new FormData();
+      data.append('upload', file); // Send the request.
+
+      this.xhr.send(data);
+    }
+  }]);
+
+  return UploadAdapter;
+}();
+
+
+
+/***/ }),
+
+/***/ "./resources/js/uploadAdapter.js":
+/*!***************************************!*\
+  !*** ./resources/js/uploadAdapter.js ***!
+  \***************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ MyUploadAdapter)
+/* harmony export */ });
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var MyUploadAdapter = /*#__PURE__*/function () {
+  function MyUploadAdapter(loader) {
+    _classCallCheck(this, MyUploadAdapter);
+
+    // The file loader instance to use during the upload.
+    this.loader = loader;
+  } // Starts the upload process.
+
+
+  _createClass(MyUploadAdapter, [{
+    key: "upload",
+    value: function upload() {
+      var _this = this;
+
+      return this.loader.file.then(function (file) {
+        return new Promise(function (resolve, reject) {
+          _this._initRequest();
+
+          _this._initListeners(resolve, reject, file);
+
+          _this._sendRequest(file);
+        });
+      });
+    } // Aborts the upload process.
+
+  }, {
+    key: "abort",
+    value: function abort() {
+      if (this.xhr) {
+        this.xhr.abort();
+      }
+    } // Initializes the XMLHttpRequest object using the URL passed to the constructor.
+
+  }, {
+    key: "_initRequest",
+    value: function _initRequest() {
+      var _document$querySelect;
+
+      var url = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '/api/image/store';
+      var token = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : (_document$querySelect = document.querySelector('[name="csrf-token"]').content) !== null && _document$querySelect !== void 0 ? _document$querySelect : '';
+      var xhr = this.xhr = new XMLHttpRequest(); // Note that your request may look different. It is up to you and your editor
+      // integration to choose the right communication channel. This example uses
+      // a POST request with JSON as a data structure but your configuration
+      // could be different.
+
+      xhr.open('POST', url, true);
+      xhr.setRequestHeader('x-csrf-token', token);
+      xhr.responseType = 'json';
+    } // Initializes XMLHttpRequest listeners.
+
+  }, {
+    key: "_initListeners",
+    value: function _initListeners(resolve, reject, file) {
+      var xhr = this.xhr;
+      var loader = this.loader;
+      var genericErrorText = "Couldn't upload file: ".concat(file.name, ".");
+      xhr.addEventListener('error', function () {
+        return reject(genericErrorText);
+      });
+      xhr.addEventListener('abort', function () {
+        return reject();
+      });
+      xhr.addEventListener('load', function () {
+        var response = xhr.response; // This example assumes the XHR server's "response" object will come with
+        // an "error" which has its own "message" that can be passed to reject()
+        // in the upload promise.
+        //
+        // Your integration may handle upload errors in a different way so make sure
+        // it is done properly. The reject() function must be called when the upload fails.
+
+        if (!response || response.error) {
+          return reject(response && response.error ? response.error.message : genericErrorText);
+        } // If the upload is successful, resolve the upload promise with an object containing
+        // at least the "default" URL, pointing to the image on the server.
+        // This URL will be used to display the image in the content. Learn more in the
+        // UploadAdapter#upload documentation.
+
+
+        resolve({
+          "default": response.url
+        });
+      }); // Upload progress when it is supported. The file loader has the #uploadTotal and #uploaded
+      // properties which are used e.g. to display the upload progress bar in the editor
+      // user interface.
+
+      if (xhr.upload) {
+        xhr.upload.addEventListener('progress', function (evt) {
+          if (evt.lengthComputable) {
+            loader.uploadTotal = evt.total;
+            loader.uploaded = evt.loaded;
+          }
+        });
+      }
+    } // Prepares the data and sends the request.
+
+  }, {
+    key: "_sendRequest",
+    value: function _sendRequest(file) {
+      // Prepare the form data.
+      var data = new FormData();
+      data.append('upload', file); // Important note: This is the right place to implement security mechanisms
+      // like authentication and CSRF protection. For instance, you can use
+      // XMLHttpRequest.setRequestHeader() to set the request headers containing
+      // the CSRF token generated earlier by your application.
+      // Send the request.
+
+      this.xhr.send(data);
+    }
+  }]);
+
+  return MyUploadAdapter;
+}();
+
+
 
 /***/ }),
 

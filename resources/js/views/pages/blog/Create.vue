@@ -55,9 +55,11 @@
 </template>
 
 <script>
-import CKEditor      from '@ckeditor/ckeditor5-vue';
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-import _             from "lodash";
+import CKEditor        from '@ckeditor/ckeditor5-vue';
+import ClassicEditor   from '@ckeditor/ckeditor5-build-classic';
+import _               from "lodash";
+import MyUploadAdapter from '../../../uploadAdapter'
+import UploadAdapter   from '../../../upload'
 
 export default {
     name      : "Create",
@@ -67,16 +69,16 @@ export default {
     },
     data() {
         return {
-            id          : '',
-            categories  : [],
-            blog        : {
+            id        : '',
+            categories: [],
+            blog      : {
                 body       : '',
                 name       : '',
                 category_id: '',
             },
-            maxSize     : 1024 * 1024 * 2,
+            maxSize   : 1024 * 1024 * 2,
 
-            editor      : ClassicEditor,
+            /*editor      : ClassicEditor,
             editorConfig: {
                 toolbar    : [
                     'heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', '|', 'insertTable', '|',
@@ -85,8 +87,21 @@ export default {
                 table      : {
                     toolbar: ['tableColumn', 'tableRow', 'mergeTableCells']
                 },
-                extraPlugin: [],
+                extraPlugin: [this.uploader],
                 language   : 'en',
+            },*/
+
+            editor      : ClassicEditor,
+            editorConfig: {
+                toolbar     : [
+                    'heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', '|', 'insertTable', '|',
+                    'imageUpload', 'mediaEmbed', '|', 'undo', 'redo'
+                ],
+                table       : {
+                    toolbar: ['tableColumn', 'tableRow', 'mergeTableCells']
+                },
+                extraPlugins: [this.simpleUploadAdapterPlugin],
+                language    : 'nl',
             },
         };
     },
@@ -99,6 +114,17 @@ export default {
         }
     },
     methods: {
+        uploader(editor) {
+            editor.plugins.get('FileRepository').createUploadAdapter = (loader) => {
+                return new UploadAdapter(loader);
+            };
+        },
+        simpleUploadAdapterPlugin(editor) {
+            editor.plugins.get('FileRepository').createUploadAdapter = (loader) => {
+                // Configure the URL to the upload script in your back-end here!
+                return new MyUploadAdapter(loader);
+            };
+        },
         getBlog() {
             axios.get(`/api/blog/${this.id}`)
                 .then(({data}) => {

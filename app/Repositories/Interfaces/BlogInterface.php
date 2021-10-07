@@ -37,4 +37,10 @@ interface BlogInterface
      * @return mixed
      */
     public function destroy(Blog $blog);
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function imageStore(Request $request): JsonResponse;
 }
