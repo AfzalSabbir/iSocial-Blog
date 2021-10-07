@@ -2,18 +2,28 @@
 
 namespace App\Http\Controllers;
 
-use App\Helpers\ImageHelper;
 use App\Models\Blog;
-use App\Repositories\BlogRepository;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Model;
+use App\Repositories\Interfaces\BlogInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 
 class BlogController extends Controller
 {
+    /**
+     * @var BlogInterface
+     */
+    private $blogRepository;
+
+    /**
+     * BlogController constructor.
+     *
+     * @param BlogInterface $blogRepository
+     */
+    public function __construct(BlogInterface $blogRepository)
+    {
+        $this->blogRepository = $blogRepository;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -21,7 +31,7 @@ class BlogController extends Controller
      */
     public function index(): JsonResponse
     {
-        return (new BlogRepository)->list();
+        return $this->blogRepository->list();
     }
 
     /**
@@ -42,7 +52,7 @@ class BlogController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
-        return (new BlogRepository)->store($request);
+        return $this->blogRepository->store($request);
     }
 
     /**
@@ -53,7 +63,7 @@ class BlogController extends Controller
      */
     public function show($id): JsonResponse
     {
-        return (new BlogRepository)->show($id);
+        return $this->blogRepository->show($id);
     }
 
     /**
@@ -76,7 +86,7 @@ class BlogController extends Controller
      */
     public function update(Request $request, Blog $blog): JsonResponse
     {
-        return (new BlogRepository)->update($request, $blog);
+        return $this->blogRepository->update($request, $blog);
     }
 
     /**
@@ -85,8 +95,8 @@ class BlogController extends Controller
      * @param Blog $blog
      * @return bool|null
      */
-    public function destroy(Blog $blog): ?bool
+    public function destroy(Blog $blog)
     {
-        return (new BlogRepository)->destroy($blog);
+        return $this->blogRepository->destroy($blog);
     }
 }

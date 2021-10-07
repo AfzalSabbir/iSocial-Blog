@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Helpers\ImageHelper;
 use App\Models\Blog;
+use App\Repositories\Interfaces\BlogInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -84,7 +85,7 @@ class BlogRepository implements BlogInterface
      * @param Blog $blog
      * @return bool|null
      */
-    public function destroy(Blog $blog): ?bool
+    public function destroy(Blog $blog)
     {
         (new ImageHelper)->deleteImage($blog->banner);
         return $blog->delete();

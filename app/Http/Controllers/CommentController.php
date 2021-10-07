@@ -4,12 +4,28 @@ namespace App\Http\Controllers;
 
 use App\Models\Comment;
 use App\Repositories\CommentRepository;
+use App\Repositories\Interfaces\CommentInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 
 class CommentController extends Controller
 {
+    /**
+     * @var CommentInterface
+     */
+    private $commentRepository;
+
+    /**
+     * CommentController constructor.
+     *
+     * @param CommentInterface $commentRepository
+     */
+    public function __construct(CommentInterface $commentRepository)
+    {
+        $this->commentRepository = $commentRepository;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -38,7 +54,7 @@ class CommentController extends Controller
      */
     public function store(Request $request)
     {
-        return (new CommentRepository())->store($request);
+        return $this->commentRepository->store($request);
     }
 
     /**
