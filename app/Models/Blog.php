@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property mixed created_at
  * @property mixed updated_at
  * @property mixed banner
+ * @property string name
  */
 class Blog extends Model
 {
