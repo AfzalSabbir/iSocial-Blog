@@ -2,6 +2,7 @@
 
 namespace App\Helpers;
 
+use App\Models\Blog;
 use Intervention\Image\Facades\Image;
 
 class ImageHelper
@@ -36,7 +37,8 @@ class ImageHelper
      */
     public function deleteImage($path = null)
     {
-        if ($path && file_exists($file_path = public_path($path))) {
+        $demo = (new Blog)->demo;
+        if ($path && $path != $demo && file_exists($file_path = public_path($path))) {
             unlink($file_path);
         }
     }

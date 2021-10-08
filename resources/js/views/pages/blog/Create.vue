@@ -6,7 +6,9 @@
                     {{ !id ? 'Create' : 'Update' }} blog
                 </h4>
                 <div>
-                    <router-link class="me-2 btn btn-primary" to="/blog/create">New Blog</router-link>
+                    <router-link class="me-2 btn btn-primary" @click="id = ''; reset()" v-if="id" to="/blog/create">
+                        New Blog
+                    </router-link>
                     <router-link class="me-2 btn btn-info" v-if="id" :to="`/blog/${id}/show`">View</router-link>
                     <router-link class="me-2 btn btn-success" to="/blog">Blog List</router-link>
                 </div>
@@ -69,27 +71,15 @@ export default {
     },
     data() {
         return {
-            id        : '',
-            categories: [],
-            blog      : {
+            id          : '',
+            categories  : [],
+            blog        : {},
+            blogSkeleton: {
                 body       : '',
                 name       : '',
                 category_id: '',
             },
-            maxSize   : 1024 * 1024 * 2,
-
-            /*editor      : ClassicEditor,
-            editorConfig: {
-                toolbar    : [
-                    'heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', '|', 'insertTable', '|',
-                    'imageUpload', 'mediaEmbed', '|', 'undo', 'redo'
-                ],
-                table      : {
-                    toolbar: ['tableColumn', 'tableRow', 'mergeTableCells']
-                },
-                extraPlugin: [this.uploader],
-                language   : 'en',
-            },*/
+            maxSize     : 1024 * 1024 * 2,
 
             editor      : ClassicEditor,
             editorConfig: {
@@ -106,6 +96,7 @@ export default {
         };
     },
     mounted() {
+        this.reset();
         this.getCategories();
 
         if (this.$route?.params?.id) {
@@ -114,6 +105,9 @@ export default {
         }
     },
     methods: {
+        reset() {
+            this.blog = _.cloneDeep(this.blogSkeleton);
+        },
         uploader(editor) {
             editor.plugins.get('FileRepository').createUploadAdapter = (loader) => {
                 return new UploadAdapter(loader);

@@ -19,6 +19,11 @@ class Blog extends Model
     use HasFactory, SoftDeletes;
 
     /**
+     * @var string
+     */
+    public $demo = '/uploads/demo.jpg';
+
+    /**
      * @var array
      */
     protected $guarded = [];
@@ -97,4 +102,15 @@ class Blog extends Model
     | MUTATORS
     |--------------------------------------------------------------------------
     */
+
+    /**
+     * @param $value
+     * @return string
+     */
+    public function setBannerAttribute($value): string
+    {
+        return $this->attributes['banner'] = !!$value
+            ? $value
+            : $this->demo;
+    }
 }

@@ -32,6 +32,8 @@
                     ></ckeditor>
                     <div class="px-3 py-3 bg-light">
                         <div><strong>Last updated:</strong> {{ blog.updated_at_humans }}</div>
+                        <div><strong>Category:</strong> {{ blog?.category?.title }}</div>
+                        <div><strong>Slug:</strong> {{ blog.slug }}</div>
                         <div><strong>Tags:</strong> {{ blog.tag }}</div>
                     </div>
                 </div>
